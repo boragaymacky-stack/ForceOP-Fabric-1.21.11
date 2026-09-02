@@ -2,7 +2,7 @@
 # Lightweight Gradle wrapper for ForceOP-Fabric-1.21.11
 set -e
 APP_HOME=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-GRADLE_VERSION=8.14.3
+GRADLE_VERSION=9.2.0
 GRADLE_USER_HOME="${GRADLE_USER_HOME:-$HOME/.gradle}"
 DIST_DIR="$GRADLE_USER_HOME/wrapper/dists/gradle-$GRADLE_VERSION"
 DIST_ZIP="$DIST_DIR/gradle-$GRADLE_VERSION-bin.zip"
