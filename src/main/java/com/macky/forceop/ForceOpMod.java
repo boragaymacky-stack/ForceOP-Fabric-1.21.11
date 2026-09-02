@@ -1,52 +1,51 @@
 package com.macky.forceop;
 
-import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.minecraft.commands.Commands;
-import net.minecraft.commands.arguments.EntityArgument;
+import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
 
 /**
- * Server-side ForceOP mod for Minecraft 1.21.11.
+ * Client-side diagnostic for the authorized competition server.
  *
- * The /forceop command intentionally has no permission requirement.
- * Install this only on servers where that behavior is desired.
+ * This mod deliberately activates only for the configured hostname and
+ * does not attempt to bypass the server's permission system.
  */
-public final class ForceOpMod implements ModInitializer {
+public final class ForceOpMod implements ClientModInitializer {
     public static final String MOD_ID = "forceop";
+    private static final String TARGET_HOST = "verizionssn3.playwithbao.com";
 
     @Override
-    public void onInitialize() {
-        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
-            dispatcher.register(
-                Commands.literal("forceop")
-                    .then(Commands.argument("player", EntityArgument.player())
-                        .executes(context -> {
-                            ServerPlayer target = EntityArgument.getPlayer(context, "player");
-                            context.getSource().getServer().getPlayerList().op(target.nameAndId());
+    public void onInitializeClient() {
+        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
+            String address = client.getCurrentServer() == null
+                    ? ""
+                    : client.getCurrentServer().ip;
 
-                            context.getSource().sendSuccess(
-                                () -> Component.literal("ForceOP: " + target.getGameProfile().name() + " is now OP."),
-                                true
-                            );
-                            return 1;
-                        }))
-            );
-
-            dispatcher.register(
-                Commands.literal("fop")
-                    .then(Commands.argument("player", EntityArgument.player())
-                        .executes(context -> {
-                            ServerPlayer target = EntityArgument.getPlayer(context, "player");
-                            context.getSource().getServer().getPlayerList().op(target.nameAndId());
-                            context.getSource().sendSuccess(
-                                () -> Component.literal("ForceOP: " + target.getGameProfile().name() + " is now OP."),
-                                true
-                            );
-                            return 1;
-                        }))
-            );
+            if (isTargetServer(address)) {
+                client.execute(() -> client.gui.getChat().addMessage(
+                        Component.literal("[ForceOP] Authorized competition server detected: " + TARGET_HOST)
+                ));
+            }
         });
+    }
+
+    private static boolean isTargetServer(String address) {
+        if (address == null || address.isBlank()) {
+            return false;
+        }
+
+        String host = address;
+        int slash = host.indexOf('/');
+        if (slash >= 0) {
+            host = host.substring(0, slash);
+        }
+
+        int colon = host.indexOf(':');
+        if (colon >= 0) {
+            host = host.substring(0, colon);
+        }
+
+        return TARGET_HOST.equalsIgnoreCase(host);
     }
 }
