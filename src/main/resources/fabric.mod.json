@@ -2,13 +2,13 @@
   "schemaVersion": 1,
   "id": "forceop",
   "version": "${version}",
-  "name": "ForceOP",
-  "description": "Adds a server-side /forceop command for Minecraft 1.21.11.",
+  "name": "ForceOP Client",
+  "description": "Server-specific client diagnostic for the authorized competition server.",
   "authors": ["Macky"],
   "license": "MIT",
-  "environment": "server",
+  "environment": "client",
   "entrypoints": {
-    "main": [
+    "client": [
       "com.macky.forceop.ForceOpMod"
     ]
   },
