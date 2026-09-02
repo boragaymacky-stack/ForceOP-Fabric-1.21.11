@@ -1,0 +1,13 @@
+{
+  "name": "ForceOP Fabric 1.21.11",
+  "image": "mcr.microsoft.com/devcontainers/java:21",
+  "postCreateCommand": "chmod +x gradlew build.sh && echo 'Codespace ready. Run ./build.sh to compile the mod.'",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "redhat.java"
+      ]
+    }
+  }
+}
