@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "forceop",
+  "version": "${version}",
+  "name": "ForceOP",
+  "description": "Adds a server-side /forceop command for Minecraft 1.21.11.",
+  "authors": ["Macky"],
+  "license": "MIT",
+  "environment": "server",
+  "entrypoints": {
+    "main": [
+      "com.macky.forceop.ForceOpMod"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.18.1",
+    "minecraft": "~1.21.11",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}
